@@ -5,7 +5,8 @@ from app.routers import chat, contact
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000", 
+    "https://my-portfolio-frontend-liart.vercel.app"
 ]
 
 app.add_middleware(
