@@ -1,18 +1,15 @@
-from llama_index.llms.openai import OpenAI
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from fastapi import FastAPI
+from app.routers import chat
 
+app = FastAPI()
 
-import os
+# Incluir el enrutador en la aplicación
+app.include_router(chat.router)
 
-from getpass import getpass
+# Ruta principal para verificar que la app esté activa
+@app.get("/")
+async def root():
+    return {"message": "Welcome to FastAPI!"}
 
-apikey = os.environ["OPENAI_API_KEY"]
-
-documents = SimpleDirectoryReader('app/resources').load_data()
-
-index = VectorStoreIndex.from_documents(documents)
-query_engine = index.as_query_engine()
-
-
-response = query_engine.query("de qué se trata el cuento?")
-print(response)
+# Run with uvicorn main:app --reload --host 127.0.0.1 --port 8000
+# http://127.0.0.1:8000/docs#/ for SwaggerUI and api docs
