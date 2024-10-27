@@ -1,10 +1,24 @@
 from fastapi import FastAPI
-from app.routers import chat
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import chat, contact
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
 # Incluir el enrutador en la aplicación
 app.include_router(chat.router)
+app.include_router(contact.router)
 
 # Ruta principal para verificar que la app esté activa
 @app.get("/")
