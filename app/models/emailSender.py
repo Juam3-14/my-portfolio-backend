@@ -9,8 +9,6 @@ class EmailSender:
         self.admin_email=os.environ.get("ADMIN_EMAIL")        
         
     async def send_admin_notification(self, mail_data: dict) -> None:
-        print(self.mail_sender)
-        print(self.admin_email)
         message = Mail(
             from_email=Email(str(self.mail_sender)),
             to_emails=To(str(self.admin_email)),
@@ -23,7 +21,6 @@ class EmailSender:
                     Mensaje: {mail_data.get("message", None)}
             """)
         )
-        
         try:
             sg = sendgrid.SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
             response = sg.client.mail.send.post(request_body=message.get())
@@ -38,7 +35,6 @@ class EmailSender:
             subject="Message confirmation - Juan Pablo Piemonte's personal portfolio",
             plain_text_content=Content("text/plain", "Thanks for your message! I'll be answering soon!")
         )
-        
         try:
             sg = sendgrid.SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
             print(message.get())

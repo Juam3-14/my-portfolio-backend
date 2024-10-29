@@ -2,3 +2,5 @@
 .env
 reCaptcha_credentials.json
 sheetsManager.json
+__pycache__/
+*.pyc
