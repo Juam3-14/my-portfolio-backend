@@ -1,14 +1,18 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel, EmailStr
 from google.cloud import recaptchaenterprise_v1
 from google.cloud.recaptchaenterprise_v1 import Assessment
-from google.auth.credentials import Credentials
 import os
+
+from app.models.emailSender import EmailSender
+from app.models.googleSheetsManager import GoogleSheetsManager
 
 router = APIRouter()
 project_id = os.environ["GOOGLE_PROJECT_ID"]
 recaptcha_site_key = os.environ["RECAPTCHA_SITE_KEY"]
 
+emailSender = EmailSender()
+sheetManager = GoogleSheetsManager()
 
 class RecaptchaRequest(BaseModel):
     token: str
@@ -106,14 +110,28 @@ async def verify_recaptcha(request: Request, recaptcha_request: RecaptchaRequest
             ja3 = None,
         )
 
+        print(recaptcha_request.message, recaptcha_request.email)
+        
         # Si quieres interpretar la puntuación, puedes hacerlo aquí
         score = assessment_response.risk_analysis.score
         reasons = assessment_response.risk_analysis.reasons
 
         # Puedes establecer un umbral de confianza según la puntuación
-        if score >= 0.5:  # Cambia este umbral según tu preferencia
-            print(recaptcha_request.firstName, recaptcha_request.lastName, recaptcha_request.email, recaptcha_request.phone, recaptcha_request.message)
-            return {"message": "reCAPTCHA validado exitosamente", "score": score, "reasons": reasons}
+        if score >= 0.7:  # Cambia este umbral según tu preferencia
+            
+            sheetManager.save_contact_info(recaptcha_request)
+            
+            mail_data: dict = {
+                "firstName": {recaptcha_request.firstName},
+                "lastName": {recaptcha_request.lastName},
+                "email": {recaptcha_request.email},
+                "phone": {recaptcha_request.phone},
+                "message": {recaptcha_request.message},
+            }
+            await emailSender.send_admin_notification(mail_data=mail_data)
+            await emailSender.send_user_confirmation(recaptcha_request.email)
+            
+            return {"message": f"reCAPTCHA validado exitosamente. Se envió un mail de confirmación a {recaptcha_request.email}.", "score": score, "reasons": reasons}
         else:
             print(score)
             raise HTTPException(status_code=400, detail="El puntaje de reCAPTCHA es bajo; sospecha de riesgo")

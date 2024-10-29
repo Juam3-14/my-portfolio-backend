@@ -2,7 +2,9 @@ fastapi
 google-api-core
 google-auth
 google-cloud-recaptcha-enterprise
+gspread
 llama-index
 llama-index-agent-openai
 uvicorn
 pydantic[email]
+sendgrid
