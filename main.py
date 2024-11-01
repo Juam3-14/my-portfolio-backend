@@ -1,8 +1,15 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 from app.routers import chat, contact
 
-app = FastAPI()
+app = FastAPI(
+    title="PersonalPortfolioBackend",
+    description="A REST API for my personal portfolio validations and data management",
+    version="v1",
+    docs_url="/app/resources"
+)
 
 origins = [
     "http://localhost:3000", 
@@ -28,3 +35,7 @@ async def root():
 
 # Run with uvicorn main:app --reload --host 127.0.0.1 --port 8000
 # http://127.0.0.1:8000/docs#/ for SwaggerUI and api docs
+
+if __name__ == "__main__":
+    port= int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="debug", reload=True)
