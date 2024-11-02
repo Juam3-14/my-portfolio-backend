@@ -72,6 +72,6 @@ class RecaptchaManager:
                 + str(response.risk_analysis.score)
             )
             # Get the assessment name (id). Use this to annotate the assessment.
-            assessment_name = client.parse_assessment_path(response.name).get("assessment")
-            print(f"Assessment name: {assessment_name}")
+            #assessment_name = client.parse_assessment_path(response.name).get("assessment")
+            #print(f"Assessment name: {assessment_name}")
         return response
