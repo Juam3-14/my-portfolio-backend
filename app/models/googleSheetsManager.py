@@ -11,8 +11,9 @@ class GoogleSheetsManager:
         self.client = gspread.authorize(creds)
         self.sheet = self.client.open_by_url(url="https://docs.google.com/spreadsheets/d/1qK6MDMP8ikNA87S_JeZZmsunUdzdrYujSPLSWr00x08/edit?usp=sharing")
 
-    def save_contact_info(self, contact_info):
+    def save_contact_info(self, contact_info, id: str):
         self.sheet.get_worksheet(0).append_row([
+            id,
             contact_info.firstName,
             contact_info.lastName,
             contact_info.email,

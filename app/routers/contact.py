@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, EmailStr
 
@@ -19,10 +20,10 @@ class RecaptchaRequest(BaseModel):
     phone: str | None = None
     message: str | None = None
 
-@router.post("/verify-recaptcha")
-async def verify_recaptcha(request: Request, recaptcha_request: RecaptchaRequest):
+@router.post("/contact-message")
+async def recieve_contact_message(request: Request, recaptcha_request: RecaptchaRequest):
     
-    try:
+    #try:
         # Llamamos a la función de evaluación
         assessment_response = recaptchaManager.create_assessment(
             token=recaptcha_request.token,
@@ -34,9 +35,11 @@ async def verify_recaptcha(request: Request, recaptcha_request: RecaptchaRequest
         score = assessment_response.risk_analysis.score
         reasons = assessment_response.risk_analysis.reasons
 
-        if score >= 0.7:  # Cambia este umbral según tu preferencia 
-            sheetManager.save_contact_info(recaptcha_request)
+        if score >= 0.6:  # Cambia este umbral según tu preferencia 
+            id = str(uuid.uuid4())
+            sheetManager.save_contact_info(recaptcha_request, id)
             mail_data: dict = {
+                "id": {id},
                 "firstName": {recaptcha_request.firstName},
                 "lastName": {recaptcha_request.lastName},
                 "email": {recaptcha_request.email},
@@ -50,5 +53,5 @@ async def verify_recaptcha(request: Request, recaptcha_request: RecaptchaRequest
         else:
             raise HTTPException(status_code=400, detail="El puntaje de reCAPTCHA es bajo; sospecha de riesgo")
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error en la verificación de reCAPTCHA: {str(e)}")
+    #except Exception as e:
+        #raise HTTPException(status_code=500, detail=f"Error en la verificación de reCAPTCHA: {str(e)}")

@@ -14,6 +14,7 @@ class EmailSender:
             to_emails=To(str(self.admin_email)),
             subject="Nuevo mensaje de contacto a tu portfolio personal",
             plain_text_content= Content("text/plain", f"""
+                    ID: {mail_data.get("id", None)}
                     Nombre: {mail_data.get("firstName", None)},
                     Apellido: {mail_data.get("lastName", None)},
                     Email: {mail_data.get("email", None)},
@@ -37,7 +38,6 @@ class EmailSender:
         )
         try:
             sg = sendgrid.SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
-            print(message.get())
             response = sg.client.mail.send.post(request_body=message.get())           
             return response
         except Exception as e:
