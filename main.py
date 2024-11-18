@@ -1,14 +1,11 @@
-import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 from app.routers import chat, contact
 
 app = FastAPI(
     title="PersonalPortfolioBackend",
     description="A REST API for my personal portfolio validations and data management",
-    version="v1",
-    docs_url="/app/resources"
+    version="v1"
 )
 
 origins = [

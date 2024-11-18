@@ -1,3 +1,4 @@
+import logging
 import os
 import sendgrid
 from sendgrid.helpers.mail import *
@@ -27,8 +28,8 @@ class EmailSender:
             response = sg.client.mail.send.post(request_body=message.get())
             return response
         except Exception as e:
-            print(e)
-        
+            logging.info(f"There was an error sending admin notification email: {e}")   
+                 
     async def send_user_confirmation(self, email: str):
         message = Mail(
             from_email=Email(str(self.mail_sender)),
@@ -41,4 +42,4 @@ class EmailSender:
             response = sg.client.mail.send.post(request_body=message.get())           
             return response
         except Exception as e:
-            print(e)
+            logging.info(f"There was an error sending user confirmation email: {e}")
